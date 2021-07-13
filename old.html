@@ -56,8 +56,8 @@ svg.selectAll("mybar")
     .attr("width", x.bandwidth())
     .attr("fill", "#69b3a2")
     // no bar at the beginning thus:
-    .attr("height", function(d) { return height - y(d.Cumulative_cases); }) // always equal to 0
-    .attr("y", function(d) { return y(d.Cumulative_cases); })
+    .attr("height", function(d) { return height - y(d.0); }) // always equal to 0
+    .attr("y", function(d) { return y(0); })
 
 // Animation
 svg.selectAll("rect")
