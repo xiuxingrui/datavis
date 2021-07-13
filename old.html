@@ -26,7 +26,7 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Parse the Data
-d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum_header.csv", function(data) {
+d3.csv("data3.csv", function(data) {
 
 // X axis
 var x = d3.scaleBand()
@@ -42,7 +42,7 @@ svg.append("g")
 
 // Add Y axis
 var y = d3.scaleLinear()
-  .domain([0, 13000])
+  .domain([0, 35000000])
   .range([ height, 0]);
 svg.append("g")
   .call(d3.axisLeft(y));
@@ -56,15 +56,15 @@ svg.selectAll("mybar")
     .attr("width", x.bandwidth())
     .attr("fill", "#69b3a2")
     // no bar at the beginning thus:
-    .attr("height", function(d) { return height - y(0); }) // always equal to 0
-    .attr("y", function(d) { return y(0); })
+    .attr("height", function(d) { return height - y(d.Cumulative_cases); }) // always equal to 0
+    .attr("y", function(d) { return y(d.Cumulative_cases); })
 
 // Animation
 svg.selectAll("rect")
   .transition()
   .duration(800)
-  .attr("y", function(d) { return y(d.Value); })
-  .attr("height", function(d) { return height - y(d.Value); })
+  .attr("y", function(d) { return y(d.Cumulative_cases); })
+  .attr("height", function(d) { return height - y(d.Cumulative_cases); })
   .delay(function(d,i){console.log(i) ; return(i*100)})
 
 })
