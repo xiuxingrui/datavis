@@ -58,5 +58,16 @@ svg.selectAll("mybar")
     .attr("fill", "#69b3a2")
 
 })
+    
+// Animation
+// Animation
+svg.selectAll("rect")
+  .transition()
+  .duration(1600)
+  .attr("y", function(d) { return y(d.Cumulative_cases); })
+  .attr("height", function(d) { return height - y(d.Cumulative_cases); })
+  .delay(function(d,i){console.log(i) ; return(i*100)})
+
+})
 
 </script>
