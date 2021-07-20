@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <title>World COVID-19 DATA VISUALIZATION</title>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- Load d3-annotation -->
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+    <style>
+        body {
+            margin: 0;
+            font: 11px sans-serif;
+            background-color: #ffffff;
+        <!-- background-image: url(''); -->
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .header h1 {
+            height: 10px;
+            top: 18px;
+            left: 10px;
+        }
+
+
+        .nav {
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+
+        .nav a {
+            float: left;
+            display: block;
+            color: #000000;
+            text-align: center;
+            padding: 20px 10px;
+            text-decoration: none;
+            font-size: medium;
+        }
+
+        /* Change color on hover */
+        .nav a:hover {
+            background-color: lightgrey;
+            color: black;
+        }
+
+
+
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container{
+            position: center;
+            margin: 30px;
+            width: 100%;
+        }
+
+
+
+
+    </style>
+</head>
+</body>
+
+<div class="header">
+    <h1 style="text-align:center;color:black;font-family:'Times New Roman';font-size:250%">COVID-19 WORLD DATA VISUALIZATION</h1>
+</div>
+
+<!--< class="body">-->
+    <div class="container">
+        <div class="nav">
+            <a href="page1.html"><b><u>WORLD MAP</u></b></a>
+            <a href="page2.html"><b><u>BY COUNTRY</u></b></a>
+            <a href="page3.html"><b><u>VACCINE DATA</u></b></a>
+            <a href="page4.html"><b><u>TREND</u></b></a>
+        </div>
+    </div>
+
+<br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Which Countries Are Facing the Most Severe COVID-19 Situation?</b><br><p style="font-size:14px; text-indent: 40px;">This data visualization is trying to answer the question: which countries are facing the most severe situation when dealing with COVID-19?  The choropleth below shows the total confirmed COVID-19 cases reported by WHO as of 07/13/2021. The map gives an overview around the world, the darker color indicates relative more confirmed cases. <b>From the map we can see United States and India have the darkest color and thus we will check these countries further.</b> Please hover over the map to find the exact number. Next step, please press "BY COUNTRY" tab above to further explore the data. </p>
+    <div id="my_dataviz" style="background-color:#ffffff;color:#202c42;padding:20px;border: 10px outset #08080e" >
+
+    </div>
+
+    <br>
+    <footer>
+        <p style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify">
+
+
+            <b>Data Courtesy:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
+            <br>
+
+            <b>Creator:</b> Rui Mao <br></p>
+    </footer>
+</div>
+
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+        background-color: cornflowerblue;
+    }
+    .hidden {
+        display: none;
+    }
+    div.tooltip {
+        color: #222;
+        background: white;
+        border-radius: 3px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        padding: .2em;
+        text-shadow: #f5f5f5 0 1px 0;
+        opacity: 0.9;
+        position: absolute;}
+</style>
+
+<!-- Load d3.js -->
+<script src="http://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
+<div class="tooltip"></div>
+
+
+<script>
+    var width = 1000;
+    var height = 475;
+    // The svg
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+
+    // Map and projection
+    var path = d3.geoPath();
+    var projection = d3.geoMercator()
+        .scale(130)
+        .center([0,20])
+        .translate([700,  400]);
+
+    // Data and color scale
+    var data = d3.map();
+    var colorScale = d3.scaleThreshold()
+        .domain([50, 10000, 100000, 1000000, 10000000,30000000])
+
+        .range(d3.schemeOranges[7]);
+
+    var tooltip = d3.select("div.tooltip");
+
+
+
+    // Load external data and boot
+    d3.queue()
+        //.defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+        .defer(d3.json, "world.json")
+        .defer(d3.csv, "data7.csv", function(d) { data.set(d.code, +d.pop); })
+        .await(ready);
+
+    function ready(error, topo ) {
+        console.log(data);
+
+        let mouseOver = function(d) {
+            d3.selectAll(".Country")
+                .transition()
+                .duration(200)
+                .style("opacity", .5)
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .style("opacity", 1)
+                .style("stroke", "black")
+            d3.select(this).attr("stroke-width",2);
+            return tooltip.style("hidden", false).html(h(d) );
+        }
+
+        let mouseLeave = function(d) {
+            d3.selectAll(".Country")
+                .transition()
+                .duration(200)
+                .style("opacity", .8)
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .style("stroke", "transparent")
+            d3.select(this).attr("stroke-width",0);
+            tooltip.classed("hidden", true);
+        }
+
+        // Draw the map
+        svg.append("g")
+            .selectAll("path")
+            .data(topo.features)
+            .enter()
+            .append("path")
+            // draw each country
+            .attr("d", d3.geoPath()
+                .projection(projection)
+            )
+            // set the color of each country
+            .attr("fill", function (d) {
+                d.total = data.get(d.id) || 0;
+
+                return colorScale(d.total);
+            })
+            .style("stroke", "transparent")
+            .attr("class", function(d){ return "Country" } )
+            .style("opacity", .8)
+            //.on("mouseover", mouseOver )
+            //.on("mouseleave", mouseLeave )
+            .on("mouseover",mouseOver)
+            .on("mousemove",function(d){
+                tooltip.classed("hidden", false)
+                    .style("top", (d3.event.pageY) + "px")
+                    .style("left", (d3.event.pageX + 10) + "px")
+                    .html(d.properties.name + " Total Cases：" + data.get(d.id))
+            })
+            .on("mouseout",mouseLeave)
+
+        // add annotations 1
+
+        // Features of the annotation
+        const annotations = [
+            {
+                note: {
+                    label: "",
+                    title: "UNITED STATES HAS THE HIGHEST COVID-19 CASES UP TO DATE 7/13/2021",
+                    align: "middle",  // try right or left
+                    wrap: 160,  // try something smaller to see text split in several lines
+                    padding: 10   // More = text lower
+                },
+                color: ["#f2f0eb"],
+                x: 460,
+                y: 360,
+                dy: 100,
+                dx: -100
+            }
+        ]
+
+        // Add annotation to the chart
+        const makeAnnotations = d3.annotation()
+            .annotations(annotations)
+        d3.select("svg")
+
+            .append("g")
+            .attr('class', 'annotation-group')
+            .call(makeAnnotations)
+
+        // d3.select('.annotation-group')
+        //     .transition()
+        //     .duration(5000)
+            // .tween('updateAnno',function(d){
+            //     xTrans = d3.interpolateNumber(0,200)
+            //     timeTrans = d3.interpolateDate(new Date("January 01, 2019 00:00:00"),new Date(new Date("January 01, 2019 00:00:00").getTime()+200*60000))
+            //     return function(t){
+            //         annotations[0].x = x(xTrans(t));
+            //         annotations[0].note.label = d3.timeFormat("%H:%M")(timeTrans(t))
+            //         makeAnnotations.annotations(annotations)
+            //         makeAnnotations.update()
+            //     }
+            // })
+        // annotation 2
+
+        // Features of the annotation
+        const annotations2 = [
+            {
+                note: {
+                    label: "",
+                    title: "INDIA IS THE SECOND COUNTRY HAS THE TOTAL CASES OVER 30 MILLION",
+                    align: "middle",  // try right or left
+                    wrap: 160,  // try something smaller to see text split in several lines
+                    padding: 10   // More = text lower
+                },
+                color: ["#f2f0eb"],
+                x: 875,
+                y: 400,
+                dy: 120,
+                dx: 10
+            }
+        ]
+
+        // Add annotation to the chart
+        const makeAnnotations2 = d3.annotation()
+            .annotations(annotations2)
+        d3.select("svg")
+            .append("g")
+            .call(makeAnnotations2)
+
+        // Features of the annotation
+        const annotations3 = [
+            {
+                note: {
+                    label: "",
+                    title: "PLEASE HOVER OVER BY MOUSE TO CHECK THE NUMBER",
+                    align: "middle",  // try right or left
+                    wrap: 200,  // try something smaller to see text split in several lines
+                    padding: 10   // More = text lower
+                },
+                color: ["#f2f0eb"],
+                x: 950,
+                y: 250,
+                dy: -80,
+                dx: 180
+            }
+        ]
+
+        // Add annotation to the chart
+        const makeAnnotations3 = d3.annotation()
+            .annotations(annotations3)
+        d3.select("svg")
+            .append("g")
+            .call(makeAnnotations3)
+
+
+
+
+
+
+
+    }
+
+</script>
