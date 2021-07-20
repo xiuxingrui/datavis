@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <title>COVID-19 World DATA TRACKER</title>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+    <style>
+        body {
+            margin: 0;
+            font: 11px sans-serif;
+            background-color: #ffffff;
+        <!-- background-image: url('img/COVID19.jpg'); -->
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .header h1 {
+            height: 10px;
+            top: 18px;
+            left: 10px;
+        }
+
+        /* Style the top navigation bar */
+        .topnav {
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        /* Style the topnav links */
+        .topnav a {
+            float: left;
+            display: inline-block;
+            color: #000000;
+            text-align: center;
+            padding: 20px 10px;
+            text-decoration: none;
+            font-size: medium;
+        }
+
+        /* Change color on hover */
+        .topnav a:hover {
+            background-color: lightgrey;
+            color: black;
+        }
+
+
+
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container{
+            position: center;
+            margin: 30px;
+            width: 100%;
+        }
+
+        .button {
+            padding: 10px 10px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            color: #fff;
+            background-color: darkblue;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px white;
+        }
+
+        .button:hover {background-color: #3e8e41}
+
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="text-align:center;color:black;font-family:'Times New Roman';font-size:250%">COVID-19 WORLD DATA VISUALIZATION</h1>
+</div>
+
+
+
+<div class="body">
+    <div class="container">
+        <div class="topnav">
+            <a href="page1.html"><b><u>WORLD MAP</u></b></a>
+            <a href="page2.html"><b><u>BY COUNTRY</u></b></a>
+            <a href="page3.html"><b><u>VACCINE DATA</u></b></a>
+            <a href="page4_3.html"><b><u>TREND</u></b></a>
+        </div>
+    </div>
+
+    <br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Which Countries Are Facing the Most Severe COVID-19 Situation?</b><br><p style="font-size:14px; text-indent: 40px;">The bar chart below shows the top 50 countries which ranked by total covid-19 cases. The chart also shows deaths and vaccination number, which also by date 07/13/2021.  Please press the blue button below to see the detail. <b>Since Brazil has the second highest death cases, and relative low vaccination number, </b> it also come into the "most severe situation" country list. You can also hover over the bar to check the detail. Next step, please press "VACCINE DATA" tab above to further analysis the data. </p>
+    <!-- Add 2 buttons -->
+
+    <div id="my_dataviz" style="background-color:#ffffff;color:#202c42;padding:20px;border: 10px outset #08080e" >
+        <div>
+            <button class="button" onclick="update('var1')">Cumulative Cases</button>
+            <button class="button" onclick="update('var2')">Death Cases</button>
+            <button class="button" onclick="update('var3')">Total Vaccinations</button>
+        </div>
+    </div>
+
+
+
+    <br>
+    <footer>
+        <p style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify">
+
+            <b>Data Courtesy:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
+            <br>
+            <b>Creator:</b> Rui Mao <br></p>
+    </footer>
+</div>
+
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+        background-color: white;
+    }
+    .hidden {
+        display: none;
+    }
+    div.tooltip {
+        color: #222;
+        background: white;
+        border-radius: 3px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        padding: .2em;
+        text-shadow: #f5f5f5 0 1px 0;
+        opacity: 0.9;
+        position: absolute;}
+</style>
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
+<div class="tooltip"></div>
+
+
+
+
+<!-- Create a div where the graph will take place -->
+
+
+<script>
+
+
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 30, right: 30, bottom: 90, left: 100},
+        width = 1000 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + 300 + "," + 60 + ")");
+
+    // Initialize the X axis
+    var x = d3.scaleBand()
+        .range([ 0, width ])
+        .padding(0.2);
+    var xAxis = svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+
+    // Initialize the Y axis
+    var y = d3.scaleLinear()
+        .range([ height, 0]);
+    var yAxis = svg.append("g")
+        .attr("class", "myYaxis")
+
+
+    // A function that create / update the plot for a given variable:
+    function update(selectedVar) {
+
+        // Parse the Data
+        d3.csv("data6.csv", function(data) {
+
+            // X axis
+            x.domain(data.map(function(d) { return d.group; }))
+            xAxis.transition().duration(1000).call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "translate(-10,0)rotate(-45)")
+                .style("text-anchor", "end");
+
+            // Add Y axis
+            y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
+            yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+            // variable u: map data to existing bars
+            var u = svg.selectAll("rect")
+                .data(data)
+
+
+
+            function mycolor(selectedVar){
+                var myColor = "#000000";
+                if (selectedVar== 'var1') {
+                    //
+                    //
+                    myColor = "#003b6d";
+                }else if (selectedVar == 'var2'){
+                    myColor = "#bf2b17";
+                } else {
+                    myColor = "#08802e";
+                }
+                return myColor;}
+
+            // create a tooltip
+            var Tooltip = d3.select("#my_dataviz")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "2px")
+                .style("border-radius", "5px")
+                .style("padding", "5px")
+
+            // Three function that change the tooltip when user hover / move / leave a cell
+            var mouseover = function(d) {
+                Tooltip
+                    .style("opacity", 1)
+                d3.select(this)
+                    .style("stroke", "black")
+                    .style("opacity", 1)
+            }
+            var mousemove = function(d) {
+                Tooltip
+                    .html("Total : " + d[selectedVar])
+                    .style("left", (d3.mouse(this)[0]+340) + "px")
+                    .style("top", (d3.mouse(this)[1]+240) + "px")
+            }
+            var mouseleave = function(d) {
+                Tooltip
+                    .style("opacity", 0)
+                d3.select(this)
+                    .style("stroke", "none")
+                    .style("opacity", 0.8)
+            }
+            // update bars
+            u
+                .enter()
+                .append("rect")
+                .merge(u)
+                .on("mouseover", mouseover )
+                .on("mousemove", mousemove )
+                .on("mouseleave", mouseleave)
+                .transition()
+                .duration(1000)
+                .attr("x", function(d) { return x(d.group); })
+                .attr("y", function(d) { return y(d[selectedVar]); })
+                .attr("width", x.bandwidth())
+                .attr("height", function(d) { return height - y(d[selectedVar]); })
+                .attr("fill", mycolor(selectedVar))
+
+
+           // u.transition()
+           // .duration(1000)
+
+
+
+        })
+    }
+
+
+
+    // Initialize plot
+    update('var1')
+
+    // ==== LEFT ====== //
+
+// annotations2
+    const annotations2 = [
+        {
+            note: {
+                label: "Brazil has the second highest death cases, while it's vaccination number appears low",
+                title: "",
+                align: "middle",  // try right or left
+                wrap: 180,  // try something smaller to see text split in several lines
+                padding: 10   // More = text lower
+            },
+            color: ["red"],
+            x: 350,
+            y: 270,
+            dy: -100,
+            dx: 100
+        }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations2 = d3.annotation()
+
+        .annotations(annotations2)
+
+
+    d3.select("svg")
+
+        .append("g")
+        .attr('class', 'annotation-group')
+        .call(makeAnnotations2);
+
+
+</script>
