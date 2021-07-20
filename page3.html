@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <title>COVID-19 World DATA TRACKER</title>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+    <style>
+        body {
+            margin: 0;
+            font: 11px sans-serif;
+            background-color: #ffffff;
+        <!-- background-image: url('img/COVID19.jpg'); -->
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .header h1 {
+            height: 10px;
+            top: 18px;
+            left: 10px;
+        }
+
+        /* Style the top navigation bar */
+        .topnav {
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        /* Style the topnav links */
+        .topnav a {
+            float: left;
+            display: inline-block;
+            color: #000000;
+            text-align: center;
+            padding: 20px 10px;
+            text-decoration: none;
+            font-size: medium;
+        }
+
+        /* Change color on hover */
+        .topnav a:hover {
+            background-color: lightgrey;
+            color: black;
+        }
+
+
+
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container{
+            position: center;
+            margin: 30px;
+            width: 80%;
+        }
+
+        .button {
+            padding: 10px 10px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            color: #fff;
+            background-color: darkblue;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px white;
+        }
+
+        .button:hover {background-color: #3e8e41}
+
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        .bubbles {
+            stroke-width: 1px;
+            stroke: black;
+            opacity: .8
+        }
+        .bubbles:hover {
+            stroke: black;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="text-align:center;color:black;font-family:'Times New Roman';font-size:250%">COVID-19 WORLD DATA VISUALIZATION</h1>
+</div>
+
+
+
+<div class="body">
+    <div class="container">
+        <div class="topnav">
+            <a href="page1.html"><b><u>WORLD MAP</u></b></a>
+            <a href="page2.html"><b><u>BY COUNTRY</u></b></a>
+            <a href="page3.html"><b><u>VACCINE DATA</u></b></a>
+            <a href="page4.html"><b><u>TREND</u></b></a>
+        </div>
+    </div>
+
+    <br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Which Countries Are Facing the Most Severe COVID-19 Situation?</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p style="font-size:14px; text-indent: 40px;" >The vaccination number alone in the previous bar chart cannot tell the true situation of the country. In this scatter plot, an indicator named "the total vaccine doses administered per 100 population" is used, the radius of the bubble indicates this number, for example, The United States has 101 vaccine doses for 100 people, in short, the bigger bubble means the better vaccination status.
+    The plot below shows the previous 50 country's vaccination status.From the chart we can easily see <b>Brazil and India have relatively small radius which indicate they are not performing well on this indicator.</b> Hover over blue "Europe" dot below, we can also see the Europe countries generally perform well on this indicator. Please press "TREND" tab above to further analysis the data. </p>
+    <!-- Add 2 buttons -->
+
+    <div id="my_dataviz" style="background-color:#ffffff;color:#202c42;padding:20px;border: 10px outset #08080e" >
+
+    </div>
+
+
+
+    <br>
+    <footer>
+        <p style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify">
+
+            <b>Data Courtesy:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
+            <br>
+
+            <b>Creator:</b> Rui Mao <br></p>
+    </footer>
+</div>
+
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+        background-color: white;
+    }
+    .hidden {
+        display: none;
+    }
+    div.tooltip {
+        color: #222;
+        background: white;
+        border-radius: 3px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        padding: .2em;
+        text-shadow: #ffffff 0 1px 0;
+        opacity: 0.9;
+        position: absolute;}
+</style>
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
+<div class="tooltip"></div>
+
+
+
+
+<!-- Create a div where the graph will take place -->
+
+
+<script>
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 40, right: 250, bottom: 100, left: 60},
+        width = 800 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", 350)
+        .append("g")
+        .attr("transform",
+            "translate(" + 400 + "," + margin.top + ")");
+
+    //Read the data
+    d3.csv("data/scatterplot.csv", function(data) {
+
+        // ---------------------------//
+        //       AXIS  AND SCALE      //
+        // ---------------------------//
+
+        // Add X axis
+        var x = d3.scaleLog()
+            .domain([300000, 33518946])
+            .range([ 0, width ]);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x).ticks(20))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+
+        // Add X axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr("y", height-10 )
+            .text("Cumulative Cases");
+
+        // Add Y axis
+        var y = d3.scaleLog()
+           // .domain([1000, 601980])
+            .domain([1000, 3019800])
+            .range([ height, 0]);
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // Add Y axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", 0)
+            .attr("y", -20 )
+            .text("Cumulative Deaths")
+            .attr("text-anchor", "start")
+
+        // Add a scale for bubble size
+        var z = d3.scaleSqrt()
+            .domain([1, 170])
+            .range([ 2, 30]);
+
+        // Add a scale for bubble color
+        var myColor = d3.scaleOrdinal()
+            .domain(["Asia", "Europe", "Americas", "Africa"])
+            .range(d3.schemeSet1);
+
+
+        // ---------------------------//
+        //      TOOLTIP               //
+        // ---------------------------//
+
+        // -1- Create a tooltip div that is hidden by default:
+        var tooltip = d3.select("#my_dataviz")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("color", "none")
+
+        // -2- Create 3 functions to show / update (when mouse move but stay on same circle) / hide the tooltip
+        var showTooltip = function(d) {
+           tooltip
+                .transition()
+                .duration(200)
+            tooltip
+                .style("opacity", 1)
+                // .html("Country: " + d.Country + "<br>"+"Total vaccine doses administered per 100 population: " + d.Per100 +"<br>" + "<p style=\"color:red\">Cumulative Cases: </p>" + d.Cases + "<br>"+"Cumulative Deaths: "+d.Deaths)
+                .html( "<b style='color: black'> Country Name : <b/>" + d.Country + "</span></br>"+
+                    "<b style='color: limegreen'> Total vaccine doses administered per 100 population:  <b/>" + d.Per100 + "</span></br>"+
+                    "<b style='color: blue'> Cumulative Cases: <b/>" + d.Cases + "</span></br>"+
+                    "<b style='color: red'> Cumulative Deaths: <b/>" + d.Deaths + "</span></br>")
+                // var html = "<span><b> Date : </b>" + d.Per100+ "</span><br/>" +
+                // "<b style='color: darkred'> Daily Cases: <b/>" + d.Cases + "</span></br>" +
+                // "<span style='color:palevioletred'><b> Avg 7 day cases: </b>" + d.Per100 + "</span></br>" +
+                // "<span style='color:red'><b> Daily Deaths: </b>" + d.Deaths + "</span></br>"
+                .style("left", (d3.mouse(this)[0]+330) + "px")
+                .style("top", (d3.mouse(this)[1]+200) + "px")
+        }
+        var moveTooltip = function(d) {
+            tooltip
+                .style("left", (d3.mouse(this)[0]+330) + "px")
+                .style("top", (d3.mouse(this)[1]+200) + "px" )
+        }
+        var hideTooltip = function(d) {
+            tooltip
+                .transition()
+                .duration(200)
+                .style("opacity", 0)
+        }
+
+
+        // ---------------------------//
+        //       HIGHLIGHT GROUP      //
+        // ---------------------------//
+
+        // What to do when one group is hovered
+        var highlight = function(d){
+            // reduce opacity of all groups
+            d3.selectAll(".bubbles").style("opacity", .05)
+            // expect the one that is hovered
+            d3.selectAll("."+d).style("opacity", 1)
+        }
+
+        // And when it is not hovered anymore
+        var noHighlight = function(d){
+            d3.selectAll(".bubbles").style("opacity", 1)
+        }
+
+
+        // ---------------------------//
+        //       CIRCLES              //
+        // ---------------------------//
+
+        // Add dots
+      //svg.append('g')
+        var a = svg.selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .on("mouseover", showTooltip )
+            .on("mousemove", moveTooltip )
+            .on("mouseleave", hideTooltip )
+            .transition()
+            .delay(function(d,i){return(i*30)})
+            .duration(2000)
+            .attr("cx", function (d) { return x(d.Cases); } )
+            .attr("cy", function (d) { return y(d.Deaths); } )
+            .attr("class", function(d) { return "bubbles " + d.region })
+            .attr("r", function (d) { return z(d.Per100); } )
+            .style("fill", function (d) { return myColor(d.region); } );
+
+            // -3- Trigger the functions for hover
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ---------------------------//
+        //       LEGEND              //
+        // ---------------------------//
+
+        // Add legend: circles
+        var valuesToShow = [10, 50, 170]
+        //  var xCircle = 390
+        var xCircle = 600
+        var xLabel = 660
+        svg
+            .selectAll("legend")
+            .data(valuesToShow)
+            .enter()
+            .append("circle")
+            .attr("cx", xCircle)
+            .attr("cy", function(d){ return height - 100 - z(d) } )
+            .attr("r", function(d){ return z(d) })
+            .style("fill", "none")
+            .attr("stroke", "black")
+
+        // Add legend: segments
+        svg
+            .selectAll("legend")
+            .data(valuesToShow)
+            .enter()
+            .append("line")
+            .attr('x1', function(d){ return xCircle + z(d) } )
+            .attr('x2', xLabel)
+            .attr('y1', function(d){ return height - 100 - z(d) } )
+            .attr('y2', function(d){ return height - 100 - z(d) } )
+            .attr('stroke', 'black')
+            .style('stroke-dasharray', ('2,2'))
+
+        // Add legend: labels
+        svg
+            .selectAll("legend")
+            .data(valuesToShow)
+            .enter()
+            .append("text")
+            .attr('x', xLabel)
+            .attr('y', function(d){ return height - 100 - z(d) } )
+            .text( function(d){ return d } )
+            .style("font-size", 10)
+            .attr('alignment-baseline', 'middle')
+
+        // Legend title
+        svg.append("text")
+            .attr('x', xCircle)
+            .attr("y", height - 100 +30)
+            .text("Vaccine Doses Per 100 people")
+            .attr("text-anchor", "middle")
+
+        // Add one dot in the legend for each name.
+        var size = 20
+        var allgroups = ["Asia", "Europe", "Americas", "Africa"]
+        svg.selectAll("myrect")
+            .data(allgroups)
+            .enter()
+            .append("circle")
+            .attr("cx", 600)
+            .attr("cy", function(d,i){ return 150 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("r", 7)
+            .style("fill", function(d){ return myColor(d)})
+            .on("mouseover", highlight)
+            .on("mouseleave", noHighlight)
+
+        // Add labels beside legend dots
+        svg.selectAll("mylabels")
+            .data(allgroups)
+            .enter()
+            .append("text")
+            .attr("x", 600 + size*.8)
+            .attr("y", function(d,i){ return i * (size + 5) + 150}) // 100 is where the first dot appears. 25 is the distance between dots
+            .style("fill", function(d){ return myColor(d)})
+            .text(function(d){ return d})
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle")
+            .on("mouseover", highlight)
+            .on("mouseleave", noHighlight)
+    })
+
+    // Features of the annotation
+    const annotations = [
+        {
+            note: {
+                label: "Brazil and India on the top right of the chart while have small radius, indicates their vaccination performance not good.Hover the mouse to check the detail.",
+                title: "",
+                align: "middle",  // try right or left
+                wrap: 180,  // try something smaller to see text split in several lines
+                padding: 30   // More = text lower
+            },
+            color: ["#000000"],
+            x: 860,
+            y: 170,
+            dy: 100,
+            dx: -50
+        }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations = d3.annotation()
+
+        .annotations(annotations)
+
+
+     d3.select("svg")
+
+        .append("g")
+        .attr('class', 'annotation-group')
+        .call(makeAnnotations);
+
+    d3.select('.annotation-group')
+        .transition()
+        .duration(1000);
+
+// annotations 2
+    const annotations2 = [
+        {
+            note: {
+                label: "Hover the mouse on name to check by region",
+                title: "",
+                align: "middle",  // try right or left
+                wrap: 160,  // try something smaller to see text split in several lines
+                padding: 10   // More = text lower
+            },
+            color: ["#000000"],
+            x: 1060,
+            y: 200,
+            dy: -100,
+            dx: 100
+        }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations2 = d3.annotation()
+
+        .annotations(annotations2)
+
+
+    d3.select("svg")
+
+        .append("g")
+        .attr('class', 'annotation-group')
+        .call(makeAnnotations2);
+
+    d3.select('.annotation-group')
+        .transition()
+        .duration(1000);
+
+
+
+
+
+</script>
