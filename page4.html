@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <title>COVID-19 World DATA TRACKER</title>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+    <style>
+        body {
+            margin: 0;
+            font: 11px sans-serif;
+            background-color: #ffffff;
+        <!-- background-image: url('img/COVID19.jpg'); -->
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .header h1 {
+            height: 10px;
+            top: 18px;
+            left: 10px;
+        }
+
+        /* Style the top navigation bar */
+        .topnav {
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        /* Style the topnav links */
+        .topnav a {
+            float: left;
+            display: inline-block;
+            color: #000000;
+            text-align: center;
+            padding: 20px 10px;
+            text-decoration: none;
+            font-size: medium;
+        }
+
+        /* Change color on hover */
+        .topnav a:hover {
+            background-color: lightgrey;
+            color: black;
+        }
+
+
+
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container{
+            position: center;
+            margin: 30px;
+            width: 100%;
+        }
+
+        .button {
+            padding: 10px 10px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            color: #fff;
+            background-color: darkblue;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px white;
+        }
+
+        .button:hover {background-color: #3e8e41}
+
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="text-align:center;color:black;font-family:'Times New Roman';font-size:250%">COVID-19 WORLD DATA VISUALIZATION</h1>
+</div>
+
+
+
+<div class="body">
+    <div class="container">
+        <div class="topnav">
+            <a href="page1.html"><b><u>WORLD MAP</u></b></a>
+            <a href="page2.html"><b><u>BY COUNTRY</u></b></a>
+            <a href="page3.html"><b><u>VACCINE DATA</u></b></a>
+            <a href="page4_3.html"><b><u>TREND</u></b></a>
+        </div>
+    </div>
+
+    <br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Which Countries Are Facing the Most Severe COVID-19 Situation?</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p style="font-size:14px; text-indent: 40px;">The line chart below narrow down the data to top 10 highest case countries.We can clearly see the trends from the chart, though United States has the highest number in every aspect, it shows the sign of increasing slowly. The India has very sharp increase around April 2021 and shows a little sign of increasing slowly. The Brazil, however, steadily increase the number and not show any sign of slow down.
+    So we can draw the <b>conclusion that compare to United States, Brazil and India are lacking of vaccine doses and they are in much severe situation which need more international attention and aid.</b> Toggle blue button below to see the detail.
+    </p>
+
+
+    <!-- Add 2 buttons -->
+
+    <div id="my_dataviz" style="background-color:#ffffff;color:#202c42;padding:20px;border: 10px outset #08080e" >
+        <div>
+            <button class="button" onclick="update('n')">Cumulative Cases</button>
+            <button class="button" onclick="update('n4')">Death Cases</button>
+
+        </div>
+    </div>
+
+
+
+    <br>
+    <footer>
+        <p style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify">
+
+            <b>Data Courtesy:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
+            <br>
+
+            <b>Creator:</b> Rui Mao <br></p>
+    </footer>
+</div>
+
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+        position: center;
+        background-color: white;
+    }
+    .hidden {
+        display: none;
+    }
+    div.tooltip {
+        color: #222;
+        background: white;
+        border-radius: 3px;
+        box-shadow: 0px 0px 2px 0px #a6a6a6;
+        padding: .2em;
+        text-shadow: #f5f5f5 0 1px 0;
+        opacity: 0.9;
+        position: absolute;}
+</style>
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
+<div class="tooltip"></div>
+
+
+
+
+
+
+<script>
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 200, bottom: 60, left: 60},
+        width = 1000 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", 380)
+        .append("g")
+        .attr("transform",
+            "translate(" + 350 + "," + 20 + ")");
+
+    var parseTime = d3.timeParse("%Y/%m/%d");
+
+    // Create the circle that travels along the curve of chart
+    var focus = svg
+        .append('g')
+        .append('circle')
+        .style("fill", "none")
+        .attr("stroke", "black")
+        .attr('r', 8.5)
+        .style("opacity", 0)
+
+    // Create the text that travels along the curve of chart
+    var focusText = svg
+        .append('g')
+        .append('text')
+        .style("opacity", 0)
+        .attr("text-anchor", "left")
+        .attr("alignment-baseline", "middle")
+
+    ////////////// legend ///////////////////////////////////////////////////
+
+
+
+
+    //Read the data
+
+    function update(selectedVar) {
+
+        svg.selectAll("*").remove();
+
+        // create a list of keys
+        var keys = ["United States","India",  "Brazil", "Russian", "France","Turkey","The United Kingdom","Argentina","Colombia","Italy"]
+
+        // Usually you have a color scale in your chart already
+        var color = d3.scaleOrdinal()
+            .domain(keys)
+            .range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#c2b800','#a65628','#f781bf','#999999','#000000'])
+
+        // Add one dot in the legend for each name.
+        var size = 20
+        //SVG.selectAll("mydots")
+        var legend = svg.selectAll("mydots")
+            .data(keys)
+            .enter()
+            .append("rect")
+            .attr("x",600)
+            .attr("y", function(d,i){ return -10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("width", size)
+            .attr("height", size)
+            .style("fill", function(d){ return color(d)})
+
+        // Add one dot in the legend for each name.
+        //SVG.selectAll("mylabels")
+        var legend = svg.selectAll("mylabels")
+            .data(keys)
+            .enter()
+            .append("text")
+            .attr("x", 600 + size*1.2)
+            .attr("y", function(d,i){ return -10 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .style("fill", function(d){ return color(d)})
+            .text(function(d){ return d})
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle")
+
+
+    d3.csv("data/covidtop10.csv", function(data) {
+
+
+        data.forEach(function (d) {
+            d.date = parseTime(d.year);
+
+            console.log(d.date);
+        });
+
+        // group the data
+        var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+            .key(function (d) {
+                return d.name;
+            })
+            .entries(data);
+
+        // Add X axis --> it is a date format
+
+        var x = d3.scaleTime().range([0, width]);
+
+        var bisect = d3.bisector(function (d) {
+            return d.year;
+        }).left;
+        x.domain(d3.extent(data, function (d) {
+            return d.date;
+        }));
+
+
+
+
+
+
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x)
+                .tickFormat(d3.timeFormat("%Y-%m-%d")).ticks(20))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(data, function (d) {
+                return +d[selectedVar];
+            })])
+            .range([height, 0]);
+
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // color palette
+        var res = sumstat.map(function (d) {
+            return d.key
+        }) // list of group names
+        var color = d3.scaleOrdinal()
+            .domain(res)
+            .range(['#377eb8', '#e41a1c', '#4daf4a', '#984ea3', '#ff7f00', '#c2b800', '#a65628', '#f781bf', '#999999', '#000000'])
+
+        // Draw the line
+
+
+
+        var lines = svg.selectAll(".line")
+            .data(sumstat)
+            .enter()
+            .append("path")
+
+            .transition()
+            .duration(2000)
+            .delay(function(d, i) {return i * 200})
+            .attr("fill", "none")
+            .attr("stroke", function (d) {
+                return color(d.key)
+            })
+            .attr("stroke-width", 1.5)
+            .attr("d", function (d) {
+                return d3.line()
+                    .x(function (d) {
+                        return x(d.date);
+                    })
+                    .y(function (d) {
+                        return y(+d[selectedVar]);
+                    })
+                    (d.values)
+            })
+
+        // What to do when one group is hovered
+        var highlight = function(d){
+            // reduce opacity of all groups
+            d3.selectAll("line").style("opacity", .05)
+            // expect the one that is hovered
+            d3.selectAll("."+d).style("opacity", 1)
+        }
+
+        // And when it is not hovered anymore
+        var noHighlight = function(d){
+            d3.selectAll("line").style("opacity", 1)
+        }
+
+
+       // lines.append("text")
+          //  .attr("class", "serie_label")
+
+
+
+
+
+
+
+
+
+
+
+
+
+    })}
+     update('n')
+
+    // ==== LEFT ====== //
+    const annotations = [
+        {
+            note: {
+                label: "Brazil and India cases increasing dramatically and show little sign of slowing down",
+                title: "",
+                wrap:160
+            },
+            type: d3.annotationCalloutCircle,
+            subject: {
+                radius: 40,         // circle radius
+                radiusPadding: 20   // white space around circle befor connector
+            },
+            color: ["red"],
+            x: 780,
+            y: 230,
+            dy: -50,
+            dx: -130
+        }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations = d3.annotation()
+        .annotations(annotations)
+
+    d3.select("svg")
+        .append("g")
+        .call(makeAnnotations)
+
+
+
+
+
+</script>
