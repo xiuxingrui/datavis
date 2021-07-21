@@ -27,13 +27,13 @@
             left: 10px;
         }
 
-        /* Style the top navigation bar */
+
         .topnav {
             overflow: hidden;
             background-color: #ffffff;
         }
 
-        /* Style the topnav links */
+
         .topnav a {
             float: left;
             display: inline-block;
@@ -44,7 +44,7 @@
             font-size: medium;
         }
 
-        /* Change color on hover */
+
         .topnav a:hover {
             background-color: lightgrey;
             color: black;
@@ -85,6 +85,25 @@
             box-shadow: 0 5px #666;
             transform: translateY(4px);
         }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            position: center;
+            background-color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        div.tooltip {
+            color: #222;
+            background: white;
+            border-radius: 3px;
+            box-shadow: 0px 0px 2px 0px #a6a6a6;
+            padding: .2em;
+            text-shadow: #f5f5f5 0 1px 0;
+            opacity: 0.9;
+            position: absolute;}
 
 
 
@@ -132,60 +151,27 @@
     </footer>
 </div>
 
-
-<style>
-    svg {
-        width: 100%;
-        height: 100%;
-        position: center;
-        background-color: white;
-    }
-    .hidden {
-        display: none;
-    }
-    div.tooltip {
-        color: #222;
-        background: white;
-        border-radius: 3px;
-        box-shadow: 0px 0px 2px 0px #a6a6a6;
-        padding: .2em;
-        text-shadow: #f5f5f5 0 1px 0;
-        opacity: 0.9;
-        position: absolute;}
-</style>
-
-<!-- Load d3.js -->
-<script src="https://d3js.org/d3.v4.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-
-<!-- Create an element where the map will take place -->
-<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
 <div class="tooltip"></div>
 
-
-
-
-<!-- Create a div where the graph will take place -->
 
 
 <script>
 
 
 
-    // set the dimensions and margins of the graph
+
     var margin = {top: 30, right: 30, bottom: 90, left: 100},
         width = 1200 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
+
     var svg = d3.select("#my_dataviz")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform",
-            "translate(" + 300 + "," + 60 + ")");
+            "translate(" + 400 + "," + 60 + ")");
 
     // Initialize the X axis
     var x = d3.scaleBand()
@@ -201,36 +187,36 @@
         .attr("class", "myYaxis")
 
 
-    // A function that create / update the plot for a given variable:
-    function update(selectedVar) {
 
-        // Parse the Data
+    function update(Var) {
+
+
         d3.csv("data/data6.csv", function(data) {
 
-            // X axis
+
             x.domain(data.map(function(d) { return d.group; }))
             xAxis.transition().duration(1000).call(d3.axisBottom(x))
                 .selectAll("text")
                 .attr("transform", "translate(-10,0)rotate(-45)")
                 .style("text-anchor", "end");
 
-            // Add Y axis
-            y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
+
+            y.domain([0, d3.max(data, function(d) { return +d[Var] }) ]);
             yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
-            // variable u: map data to existing bars
-            var u = svg.selectAll("rect")
+
+            var bar = svg.selectAll("rect")
                 .data(data)
 
 
 
-            function mycolor(selectedVar){
+            function mycolor(Var){
                 var myColor = "#000000";
-                if (selectedVar== 'var1') {
+                if (Var== 'var1') {
                     //
                     //
                     myColor = "#003b6d";
-                }else if (selectedVar == 'var2'){
+                }else if (Var == 'var2'){
                     myColor = "#bf2b17";
                 } else {
                     myColor = "#08802e";
@@ -248,7 +234,7 @@
                 .style("border-radius", "5px")
                 .style("padding", "5px")
 
-            // Three function that change the tooltip when user hover / move / leave a cell
+
             var mouseover = function(d) {
                 Tooltip
                     .style("opacity", 1)
@@ -258,7 +244,7 @@
             }
             var mousemove = function(d) {
                 Tooltip
-                    .html("Total : " + d[selectedVar])
+                    .html("Total : " + d[Var])
                     .style("left", (d3.mouse(this)[0]+340) + "px")
                     .style("top", (d3.mouse(this)[1]+240) + "px")
             }
@@ -270,36 +256,30 @@
                     .style("opacity", 0.8)
             }
             // update bars
-            u
+
+                bar
                 .enter()
                 .append("rect")
-                .merge(u)
+                .merge(bar)
                 .on("mouseover", mouseover )
                 .on("mousemove", mousemove )
                 .on("mouseleave", mouseleave)
                 .transition()
                 .duration(1000)
                 .attr("x", function(d) { return x(d.group); })
-                .attr("y", function(d) { return y(d[selectedVar]); })
+                .attr("y", function(d) { return y(d[Var]); })
                 .attr("width", x.bandwidth())
-                .attr("height", function(d) { return height - y(d[selectedVar]); })
-                .attr("fill", mycolor(selectedVar))
-
-
-           // u.transition()
-           // .duration(1000)
-
+                .attr("height", function(d) { return height - y(d[Var]); })
+                .attr("fill", mycolor(Var))
 
 
         })
     }
 
 
-
-    // Initialize plot
     update('var1')
 
-    // ==== LEFT ====== //
+
 
 // annotations2
     const annotations2 = [
@@ -307,9 +287,9 @@
             note: {
                 label: "Brazil has the second highest death cases, while it's vaccination number appears low",
                 title: "",
-                align: "middle",  // try right or left
-                wrap: 180,  // try something smaller to see text split in several lines
-                padding: 10   // More = text lower
+                align: "middle",
+                wrap: 180,
+                padding: 10
             },
             color: ["red"],
             x: 350,
@@ -319,7 +299,7 @@
         }
     ]
 
-    // Add annotation to the chart
+    // Add annotation
     const makeAnnotations2 = d3.annotation()
 
         .annotations(annotations2)
