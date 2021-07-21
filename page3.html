@@ -303,7 +303,7 @@
         var valuesToShow = [10, 50, 170]
 
         var xCircle = 750
-        var xLabel = 660
+        var xLabel = 810
         svg
             .selectAll("legend")
             .data(valuesToShow)
@@ -338,13 +338,14 @@
             .style("font-size", 10)
             .attr('alignment-baseline', 'middle')
 
-
+        
         svg.append("text")
             .attr('x', xCircle)
             .attr("y", height - 100 +30)
             .text("Vaccine Doses Per 100 people")
             .attr("text-anchor", "middle")
 
+        // Add legend name
         var size = 20
         var allgroups = ["Asia", "Europe", "Americas", "Africa"]
         svg.selectAll("myrect")
@@ -384,7 +385,7 @@
                 padding: 30
             },
             color: ["#000000"],
-            x: 1100,
+            x: 1150,
             y: 220,
             dy: 100,
             dx: -50
@@ -419,7 +420,7 @@
             },
             color: ["#000000"],
             x: 1300,
-            y: 250,
+            y: 450,
             dy: -100,
             dx: 100
         }
