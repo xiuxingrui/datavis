@@ -127,8 +127,8 @@
 
 <script>
 
-    var width = 1200;
-    var height = 675;
+    var width = 1000;
+    var height = 475;
     // The svg
     var svg = d3.select("#my_dataviz")
         .append("svg")
@@ -139,7 +139,7 @@
     // Map and projection
     var path = d3.geoPath();
     var projection = d3.geoMercator()
-        .scale(130)
+        .scale(150)
         .center([0,20])
         .translate([800,  500]);
 
