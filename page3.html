@@ -302,7 +302,7 @@
         // Add legend
         var valuesToShow = [10, 50, 170]
 
-        var xCircle = 600
+        var xCircle = 750
         var xLabel = 660
         svg
             .selectAll("legend")
@@ -352,7 +352,7 @@
             .enter()
             .append("circle")
             .attr("cx", 750)
-            .attr("cy", function(d,i){ return 150 + i*(size+5)})
+            .attr("cy", function(d,i){ return 350 + i*(size+5)})
             .attr("r", 7)
             .style("fill", function(d){ return myColor(d)})
             .on("mouseover", highlight)
@@ -364,7 +364,7 @@
             .enter()
             .append("text")
             .attr("x", 750 + size*.8)
-            .attr("y", function(d,i){ return i * (size + 5) + 150})
+            .attr("y", function(d,i){ return i * (size + 5) + 350})
             .style("fill", function(d){ return myColor(d)})
             .text(function(d){ return d})
             .attr("text-anchor", "left")
@@ -418,7 +418,7 @@
                 padding: 10
             },
             color: ["#000000"],
-            x: 1250,
+            x: 1300,
             y: 250,
             dy: -100,
             dx: 100
