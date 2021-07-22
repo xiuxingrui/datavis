@@ -15,7 +15,7 @@
             margin: 0;
             font: 11px sans-serif;
             background-color: #ffffff;
-        <!-- background-image: url('img/COVID19.jpg'); -->
+        <!-- background-image: url(''); -->
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-size: 100% 100%;
@@ -209,15 +209,15 @@
 
         svg.selectAll("*").remove();
 
-        // create a list of keys
+       
         var keys = ["United States","India",  "Brazil", "Russian", "France","Turkey","The United Kingdom","Argentina","Colombia","Italy"]
 
-        // Usually you have a color scale in your chart already
+        
         var color = d3.scaleOrdinal()
             .domain(keys)
-            .range(['#e41a2d','#376eb8','#4daf5b','#984ea4','#ff7f01','#c2b801','#a65629','#f781be','#999999','#000000'])
+            .range(['#e41a2d','#376eb8','#4daf6b','#984eb4','#ff7f11','#c2b811','#a65639','#f781ce','#999999','#000000'])
 
-        // Add one dot in the legend for each name.
+        
         var size = 20
         //SVG.selectAll("mydots")
         var legend = svg.selectAll("mydots")
@@ -225,7 +225,7 @@
             .enter()
             .append("rect")
             .attr("x",800)
-            .attr("y", function(d,i){ return -10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("y", function(d,i){ return -10 + i*(size+5)}) 
             .attr("width", size)
             .attr("height", size)
             .style("fill", function(d){ return color(d)})
@@ -237,7 +237,7 @@
             .enter()
             .append("text")
             .attr("x", 800 + size*1.2)
-            .attr("y", function(d,i){ return -10 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("y", function(d,i){ return -10 + i*(size+5) + (size/2)}) 
             .style("fill", function(d){ return color(d)})
             .text(function(d){ return d})
             .attr("text-anchor", "left")
@@ -253,14 +253,14 @@
             console.log(d.date);
         });
 
-        // group the data
-        var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+       
+        var sumstat = d3.nest() 
             .key(function (d) {
                 return d.name;
             })
             .entries(data);
 
-        // Add X axis --> it is a date format
+      
 
         var x = d3.scaleTime().range([0, width]);
 
@@ -296,15 +296,15 @@
         svg.append("g")
             .call(d3.axisLeft(y));
 
-        // color palette
+       
         var res = sumstat.map(function (d) {
             return d.key
-        }) // list of group names
+        }) 
         var color = d3.scaleOrdinal()
             .domain(res)
-            .range(['#376eb8', '#e41a2d', '#4daf5b', '#984ea4', '#ff7f01', '#c2b801', '#a65629', '#f781be', '#999999', '#000000'])
+            .range(['#376eb8', '#e41a2d', '#4daf6b', '#984eb4', '#ff7f11', '#c2b811', '#a65639', '#f781ce', '#999999', '#000000'])
 
-        // Draw the line
+
 
 
 
@@ -332,22 +332,19 @@
                     (d.values)
             })
 
-        // What to do when one group is hovered
+        
         var highlight = function(d){
-            // reduce opacity of all groups
+            // reduce opacity 
             d3.selectAll("line").style("opacity", .05)
-            // expect the one that is hovered
+            
             d3.selectAll("."+d).style("opacity", 1)
         }
 
-        // And when it is not hovered anymore
+        
         var noHighlight = function(d){
             d3.selectAll("line").style("opacity", 1)
         }
 
-
-       // lines.append("text")
-          //  .attr("class", "serie_label")
 
 
 
@@ -364,7 +361,7 @@
     })}
      update('n')
 
-    // ==== LEFT ====== //
+    
     const annotations = [
         {
             note: {
@@ -374,18 +371,18 @@
             },
             type: d3.annotationCalloutCircle,
             subject: {
-                radius: 50,         // circle radius
-                radiusPadding: 20   // white space around circle befor connector
+                radius: 50,        
+                radiusPadding: 20   
             },
             color: ["red"],
             x: 1060,
-            y: 300,
+            y: 290,
             dy: -50,
             dx: -130
         }
     ]
 
-    // Add annotation to the chart
+    // Add annotation 
     const makeAnnotations = d3.annotation()
         .annotations(annotations)
 
