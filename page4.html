@@ -167,8 +167,8 @@
 <script>
 
     var margin = {top: 10, right: 200, bottom: 60, left: 60},
-        width = 800 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        width = 1000 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
 
 
     var svg = d3.select("#my_dataviz")
@@ -177,7 +177,7 @@
         .attr("height", 280)
         .append("g")
         .attr("transform",
-            "translate(" + 350 + "," + 20 + ")");
+            "translate(" + 450 + "," + 20 + ")");
 
     var parseTime = d3.timeParse("%Y/%m/%d");
 
@@ -378,7 +378,7 @@
                 radiusPadding: 20   // white space around circle befor connector
             },
             color: ["red"],
-            x: 780,
+            x: 880,
             y: 230,
             dy: -50,
             dx: -130
