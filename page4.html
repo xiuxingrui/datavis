@@ -27,13 +27,13 @@
             left: 10px;
         }
 
-        /* Style the top navigation bar */
+
         .topnav {
             overflow: hidden;
             background-color: #ffffff;
         }
 
-        /* Style the topnav links */
+
         .topnav a {
             float: left;
             display: inline-block;
@@ -44,7 +44,7 @@
             font-size: medium;
         }
 
-        /* Change color on hover */
+
         .topnav a:hover {
             background-color: lightgrey;
             color: black;
@@ -85,6 +85,25 @@
             box-shadow: 0 5px #666;
             transform: translateY(4px);
         }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            position: center;
+            background-color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        div.tooltip {
+            color: #222;
+            background: white;
+            border-radius: 3px;
+            box-shadow: 0px 0px 2px 0px #a6a6a6;
+            padding: .2em;
+            text-shadow: #f5f5f5 0 1px 0;
+            opacity: 0.9;
+            position: absolute;}
 
 
 
@@ -130,42 +149,14 @@
     <footer>
         <p style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify">
 
-            <b>Data Courtesy:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
+            <b>Data Source:</b><a href="https://covid19.who.int/info/"> https://covid19.who.int/info/</a>
             <br>
 
-            <b>Creator:</b> Rui Mao <br></p>
+            <b>Created By:</b> Rui Mao <br></p>
     </footer>
 </div>
 
 
-<style>
-    svg {
-        width: 100%;
-        height: 100%;
-        position: center;
-        background-color: white;
-    }
-    .hidden {
-        display: none;
-    }
-    div.tooltip {
-        color: #222;
-        background: white;
-        border-radius: 3px;
-        box-shadow: 0px 0px 2px 0px #a6a6a6;
-        padding: .2em;
-        text-shadow: #f5f5f5 0 1px 0;
-        opacity: 0.9;
-        position: absolute;}
-</style>
-
-<!-- Load d3.js -->
-<script src="https://d3js.org/d3.v4.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-
-<!-- Create an element where the map will take place -->
-<!--<svg id="my_dataviz" width="800" height="600"></svg>-->
 <div class="tooltip"></div>
 
 
@@ -174,23 +165,23 @@
 
 
 <script>
-    // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 200, bottom: 60, left: 60},
-        width = 1000 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
+    var margin = {top: 10, right: 200, bottom: 60, left: 60},
+        width = 800 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+
     var svg = d3.select("#my_dataviz")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", 380)
+        .attr("height", 280)
         .append("g")
         .attr("transform",
             "translate(" + 350 + "," + 20 + ")");
 
     var parseTime = d3.timeParse("%Y/%m/%d");
 
-    // Create the circle that travels along the curve of chart
+
     var focus = svg
         .append('g')
         .append('circle')
@@ -199,7 +190,7 @@
         .attr('r', 8.5)
         .style("opacity", 0)
 
-    // Create the text that travels along the curve of chart
+
     var focusText = svg
         .append('g')
         .append('text')
@@ -207,12 +198,12 @@
         .attr("text-anchor", "left")
         .attr("alignment-baseline", "middle")
 
-    ////////////// legend ///////////////////////////////////////////////////
 
 
 
 
-    //Read the data
+
+
 
     function update(selectedVar) {
 
@@ -224,7 +215,7 @@
         // Usually you have a color scale in your chart already
         var color = d3.scaleOrdinal()
             .domain(keys)
-            .range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#c2b800','#a65628','#f781bf','#999999','#000000'])
+            .range(['#e41a2c','#376eb9','#4daf5a','#984ea3','#ff7f00','#c2b800','#a65628','#f781bf','#999999','#000000'])
 
         // Add one dot in the legend for each name.
         var size = 20
