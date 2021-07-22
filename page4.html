@@ -168,7 +168,7 @@
 
     var margin = {top: 10, right: 200, bottom: 60, left: 60},
         width = 1000 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+        height = 500 - margin.top - margin.bottom;
 
 
     var svg = d3.select("#my_dataviz")
@@ -224,7 +224,7 @@
             .data(keys)
             .enter()
             .append("rect")
-            .attr("x",600)
+            .attr("x",800)
             .attr("y", function(d,i){ return -10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("width", size)
             .attr("height", size)
@@ -236,7 +236,7 @@
             .data(keys)
             .enter()
             .append("text")
-            .attr("x", 600 + size*1.2)
+            .attr("x", 800 + size*1.2)
             .attr("y", function(d,i){ return -10 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
             .style("fill", function(d){ return color(d)})
             .text(function(d){ return d})
@@ -378,8 +378,8 @@
                 radiusPadding: 20   // white space around circle befor connector
             },
             color: ["red"],
-            x: 880,
-            y: 230,
+            x: 1000,
+            y: 430,
             dy: -50,
             dx: -130
         }
