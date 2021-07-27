@@ -142,7 +142,7 @@
 
         </div>
     </div>
- <br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;More Country's Trend</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p style="font-size:14px; text-indent: 40px;"> Check a country's total cases trend by selecting a country name from dropdown list, the Y axis is in log scale.
+ <br style="background-color:white;font-family:Helvetica Neue;font-size:130%" align="justify"><b style="color: black;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;More Country's Trend</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p style="font-size:14px; text-indent: 40px;"> Check a country's COVID-19 cases trend (Total Cases)by selecting a country name from the dropdown list below, please note the Y axis is in log scale.
 </p>
 
 
@@ -406,8 +406,8 @@
 
         // set the dimensions and margins of the graph
     var margin2 = {top: 10, right: 200, bottom: 60, left: 60},
-        width2 = 800 - margin2.left - margin2.right,
-        height2 = 400 - margin2.top - margin2.bottom;
+        width2 = 1000 - margin2.left - margin2.right,
+        height2 = 500 - margin2.top - margin2.bottom;
 
     // append the svg object to the body of the page
     var svg2 = d3.select("#my_dataviz2")
@@ -416,7 +416,7 @@
         .attr("height", 280)
         .append("g")
         .attr("transform",
-            "translate(" + 350 + "," + 20 + ")");
+            "translate(" + 450 + "," + 20 + ")");
 
     var parseTime2 = d3.timeParse("%Y%m%d");
 
