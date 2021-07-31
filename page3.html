@@ -15,7 +15,6 @@
             margin: 0;
             font: 11px sans-serif;
             background-color: #ffffff;
-        <!-- background-image: url(''); -->
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-size: 100% 100%;
@@ -216,18 +215,18 @@
             .text("Cumulative Deaths")
             .attr("text-anchor", "start")
 
-        // Scale for bubble size
+    
         var z = d3.scaleSqrt()
             .domain([1, 170])
             .range([ 2, 30]);
 
-        // Scale for bubble color
+ 
         var myColor = d3.scaleOrdinal()
             .domain(["Asia", "Europe", "Americas", "Africa"])
             .range(d3.schemeSet1);
 
 
-        //  Create a tooltip
+    
         var tooltip = d3.select("#my_dataviz")
             .append("div")
             .style("opacity", 0)
@@ -279,8 +278,7 @@
 
 
 
-        // Add dots
-      //svg.append('g')
+
         var a = svg.selectAll("dot")
             .data(data)
             .enter()
@@ -298,8 +296,6 @@
             .style("fill", function (d) { return myColor(d.region); } );
 
 
-
-        // Add legend
         var valuesToShow = [10, 50, 170]
 
         var xCircle = 750
@@ -345,7 +341,6 @@
             .text("Vaccine Doses Per 100 people")
             .attr("text-anchor", "middle")
 
-        // Add legend name
         var size = 20
         var allgroups = ["Asia", "Europe", "Americas", "Africa"]
         svg.selectAll("myrect")
@@ -392,7 +387,6 @@
         }
     ]
 
-    // Add annotation to the chart
     const makeAnnotations = d3.annotation()
 
         .annotations(annotations)
@@ -426,7 +420,7 @@
         }
     ]
 
-    // Add annotation 
+
     const makeAnnotations2 = d3.annotation()
 
         .annotations(annotations2)
