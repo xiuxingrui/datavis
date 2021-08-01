@@ -128,21 +128,21 @@
 
     var width = 1000;
     var height = 475;
-    // The svg
+    
     var svg = d3.select("#my_dataviz")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
 
 
-    // Map and projection
+
     var path = d3.geoPath();
     var projection = d3.geoMercator()
         .scale(150)
         .center([0,20])
         .translate([width-150,  height+25]);
 
-    // Data and color scale
+
     var data = d3.map();
     var colorScale = d3.scaleThreshold()
         .domain([50, 10000, 100000, 1000000, 10000000,30000000])
@@ -189,17 +189,17 @@
             tooltip.classed("hidden", true);
         }
 
-        // Draw the map
+
         svg.append("g")
             .selectAll("path")
             .data(topo.features)
             .enter()
             .append("path")
-            // draw each country
+     
             .attr("d", d3.geoPath()
                 .projection(projection)
             )
-            // set the color for each country
+      
             .attr("fill", function (d) {
                 d.total = data.get(d.id) || 0;
 
@@ -237,7 +237,7 @@
             }
         ]
 
-        // Add annotation to the chart
+  
         const makeAnnotations = d3.annotation()
             .annotations(annotations)
         d3.select("svg")
@@ -248,7 +248,7 @@
 
         // annotation 2
 
-        // Features of the annotation
+
         const annotations2 = [
             {
                 note: {
